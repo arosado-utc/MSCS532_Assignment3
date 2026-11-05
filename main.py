@@ -14,9 +14,9 @@ Two quick sort variants for Part 1:
 
 Based on Chapter 8 of Cormen, Leiserson, Rivest & Stein,
 "Introduction to Algorithms" (4th ed., 2022).
-
-TODO: implement randomized quick sort.
 """
+
+import random
 
 
 def deterministic_quick_sort(arr):
@@ -39,7 +39,7 @@ def deterministic_quick_sort(arr):
     """
     if not arr:
         return arr
-    _quicksort(arr, 0, len(arr) - 1)
+    _quicksort(arr, 0, len(arr) - 1, randomized=False)
     return arr
 
 
@@ -69,26 +69,47 @@ def partition(arr, low, high, pivot_index):
     return i + 1
 
 
-def _quicksort(arr, low, high):
-    """Recursive driver for deterministic_quick_sort; bounds are inclusive.
+def _quicksort(arr, low, high, randomized):
+    """Recursive driver for the quick sorts; bounds are inclusive.
 
-    The pivot is always the first element of the current subarray.
+    Parameter: arr        - the list
+               low        - left bound of the subarray (inclusive)
+               high       - right bound of the subarray (inclusive)
+               randomized - True picks a random pivot, False picks the
+                            first element
     """
     if low >= high:
         return
-    p = partition(arr, low, high, low)
-    _quicksort(arr, low, p - 1)
-    _quicksort(arr, p + 1, high)
+    if randomized:
+        pivot_index = random.randint(low, high)
+    else:
+        pivot_index = low
+    p = partition(arr, low, high, pivot_index)
+    _quicksort(arr, low, p - 1, randomized)
+    _quicksort(arr, p + 1, high, randomized)
 
 
 def randomized_quick_sort(arr):
     """Sort a list of comparable elements IN PLACE in increasing order.
 
-    TODO: implement the randomized quick sort (pick a pivot uniformly at
-    random from the current subarray, partition with the Lomuto scheme,
-    then recursively sort the two parts).
+    Picks the pivot uniformly at random from the current subarray, so no
+    particular input order is guaranteed to be the worst case. The
+    expected number of comparisons on ANY input of n distinct keys is
+    about (2 ln n) n, giving O(n log n) expected time.
+
+    Parameter: arr - list of comparable elements
+    Return:    the same list object, sorted in increasing order
+
+    Complexity:
+        Time   - O(n log n) expected on every input; O(n^2) is still
+                  possible for any fixed input, but it requires n
+                  unlucky pivot choices in a row (probability 1/n!).
+        Space  - O(log n) call stack on average, O(n) in the worst case.
+        Stable - no, because the partition swaps elements freely.
     """
-    # Placeholder - the algorithm is not implemented yet.
+    if not arr:
+        return arr
+    _quicksort(arr, 0, len(arr) - 1, randomized=True)
     return arr
 
 
